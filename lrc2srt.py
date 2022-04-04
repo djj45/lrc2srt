@@ -203,16 +203,6 @@ def lrc2srt(file_name):
 if __name__ == "__main__":
     count = 0
 
-    latest_version = get_version()
-    if latest_version == "error":
-        os.system("")
-        print("\033[1;31;40m版本检查失败,请检查网络连接\033[0m")
-    elif latest_version > version:
-        os.system("")
-        print(
-            "\033[1;31;40m有新版本,下载链接\nhttps://gitee.com/djj45/lrc2srt/releases\nhttps://github.com/djj45/lrc2srt/releases\033[0m"
-        )
-
     os.system("")  # 没有这一句cmd颜色显示不出来
     print(
         "\033[1;32;40m显示持续时间大于8秒的歌词,请注意是否为间奏,同时注意最后一句歌词(默认持续时间为8秒)。如果使用LyricCapture的模式三,请注意中外歌词交界的地方\033[0m\n\n"
@@ -225,4 +215,14 @@ if __name__ == "__main__":
     if not count:
         os.system("")
         print("\033[1;31;40m当前目录下无lrc文件,请把程序与lrc歌词放在一起再运行\033[0m")
+
+    latest_version = get_version()
+    if latest_version == "error":
+        os.system("")
+        print("\033[1;31;40m版本检查失败,请检查网络连接\033[0m")
+    elif latest_version > version:
+        os.system("")
+        print(
+            "\033[1;31;40m有新版本,下载链接\nhttps://gitee.com/djj45/lrc2srt/releases\nhttps://github.com/djj45/lrc2srt/releases\033[0m"
+        )
     os.system("pause")
