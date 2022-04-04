@@ -1,8 +1,41 @@
 import os
 import html
+import requests
 
 
 INTERVAL = 8
+headers = {
+    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36"
+}
+version = 20220404
+
+
+def check_version():
+    try:
+        resp = requests.get(
+            "https://gitee.com/djj45/lrc2srt/raw/master/version", headers=headers
+        )
+    except:
+        try:
+            resp = requests.get(
+                "https://gitee.com/djj45/lrc2srt/raw/master/version", headers=headers
+            )
+        except:
+            return "error"
+        else:
+            return resp.text
+    else:
+        return resp.text
+
+
+def get_version():
+    version = check_version()
+    try:
+        int(version)
+    except:
+        return "error"
+    else:
+        return int(version)
 
 
 def check_encoding(file_name):
@@ -169,8 +202,21 @@ def lrc2srt(file_name):
 
 if __name__ == "__main__":
     count = 0
+
+    latest_version = get_version()
+    if latest_version == "error":
+        os.system("")
+        print("\033[1;31;40m版本检查失败,请检查网络连接\033[0m")
+    elif latest_version > version:
+        os.system("")
+        print(
+            "\033[1;31;40m有新版本,下载链接\nhttps://gitee.com/djj45/lrc2srt/releases\nhttps://github.com/djj45/lrc2srt/releases\033[0m"
+        )
+
     os.system("")  # 没有这一句cmd颜色显示不出来
-    print("\033[1;32;40m显示持续时间大于8秒的歌词,请注意是否为间奏,同时注意最后一句歌词(默认持续时间为8秒)。如果使用LyricCapture的模式三,请注意中外歌词交界的地方\033[0m\n\n")
+    print(
+        "\033[1;32;40m显示持续时间大于8秒的歌词,请注意是否为间奏,同时注意最后一句歌词(默认持续时间为8秒)。如果使用LyricCapture的模式三,请注意中外歌词交界的地方\033[0m\n\n"
+    )
     for file_name in os.listdir():  # 转换当前目录中所有lrc文件
         if file_name.endswith("lrc"):
             count += 1
