@@ -5,3 +5,13 @@
 ### 运行截图
 
 <img src="演示.png" alt="演示" width=900 />
+
+### 建议配合使用的歌词下载软件
+
+建议首选`LyricCapture`
+
+https://github.com/ElliottSilence/LyricCapture
+
+https://github.com/jitwxs/163MusicLyrics
+
+https://github.com/BesLyric-for-X/BesLyric-for-X

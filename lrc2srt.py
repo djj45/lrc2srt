@@ -24,13 +24,18 @@ def is_lyric(line):
     """
     歌词开头为[00:00.00],[与:中间为数字
     [ver:v1.0]之类的不是歌词
+    https://github.com/ElliottSilence/LyricCapture
+    的模式三自带中外歌词分离功能,没有对应中文翻译的歌词变成"//"
     """
     try:
         int(line.split("[")[1].split(":")[0])
     except:
         return False
     else:
-        return True
+        if line.split("]")[1].find("//") == -1:
+            return True
+        else:
+            return False
 
 
 def get_time(line):
@@ -45,7 +50,7 @@ def get_lyric(line):
     [00:00.00]xxx -> xxx
     qq音乐的韩语歌词要进行编码转换
     """
-    if line.find("&#"):
+    if line.find("&#") != -1:
         return qq_music(line.split("]")[1])
     else:
         return line.split("]")[1]
@@ -118,7 +123,7 @@ def lrc2srt(file_name):
 
     print("\033[1;34;40m%s\033[0m" % file_name)
 
-    with open(file_name.split(".")[0] + ".srt", "w") as srt:
+    with open(file_name.split(".")[0] + ".srt", "w", encoding="utf-8") as srt:
         with open(file_name, "r", encoding=lrc_encoding, errors=lrc_errors) as lrc:
             for line in lrc:
                 if not is_lyric(line):  # 跳过非歌词
