@@ -170,7 +170,7 @@ def lrc2srt(file_name):
 if __name__ == "__main__":
     count = 0
     os.system("")  # 没有这一句cmd颜色显示不出来
-    print("\033[1;32;40m显示持续时间大于8秒的歌词,请注意是否为间奏,同时注意最后一句歌词(默认持续时间为8秒)\033[0m\n\n")
+    print("\033[1;32;40m显示持续时间大于8秒的歌词,请注意是否为间奏,同时注意最后一句歌词(默认持续时间为8秒)。如果使用LyricCapture的模式三,请注意中外歌词交界的地方\033[0m\n\n")
     for file_name in os.listdir():  # 转换当前目录中所有lrc文件
         if file_name.endswith("lrc"):
             count += 1
