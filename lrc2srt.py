@@ -7,7 +7,7 @@ INTERVAL = 8
 headers = {
     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36"
 }
-version = 20220405
+version = 20220406
 
 
 def check_version():
@@ -31,11 +31,11 @@ def check_version():
 def get_version():
     version = check_version()
     try:
-        int(version)
+        float(version)
     except:
         return "error"
     else:
-        return int(version)
+        return float(version)
 
 
 def check_encoding(file_name):
@@ -129,17 +129,20 @@ def time_trans(time):
         )
 
 
-def check_time(pre_time, time, pre_lyric, enter_flag, once_flag):
+def check_time(
+    pre_time, time, pre_lyric, enter_flag, last_foreign_flag, first_chinese_flag
+):
     """
-    显示持续时间超过INTERVAL(8秒)的歌词
+    显示持续时间超过INTERVAL(8秒)的歌词,后面的三个flag是针对LyricCapture的模式三
     """
     if time_trans(time) - time_trans(pre_time) > INTERVAL:
         print(pre_time + " --> " + time + " " + pre_lyric.replace("\n", ""))
-    elif abs(time_trans(time) - time_trans(pre_time)) > 50 and once_flag:
+    elif last_foreign_flag and time_trans(pre_time) - time_trans(time) > 50:
         time = extend_time(pre_time)
         enter_flag = True
-        once_flag = False
-    return time, enter_flag, once_flag
+        last_foreign_flag = False
+        first_chinese_flag = True
+    return time, enter_flag, last_foreign_flag, first_chinese_flag
 
 
 def qq_music(lyric):
@@ -153,7 +156,8 @@ def lrc2srt(file_name):
     n = 0
     flag = True  # 读第一行然后跳过,此后读第n行写第n-1行
     enter_flag = False
-    once_flag = True
+    last_foreign_flag = True
+    first_chinese_flag = False
     lrc_encoding = "utf-8"
     lrc_errors = ""
 
@@ -175,7 +179,14 @@ def lrc2srt(file_name):
                     continue
                 n += 1
                 time = get_time(line)
-                time, enter_flag, once_flag = check_time(pre_time, time, pre_lyric, enter_flag, once_flag)
+                time, enter_flag, last_foreign_flag, first_chinese_flag = check_time(
+                    pre_time,
+                    time,
+                    pre_lyric,
+                    enter_flag,
+                    last_foreign_flag,
+                    first_chinese_flag,
+                )
                 srt.write(
                     str(n)
                     + "\n"
@@ -188,10 +199,13 @@ def lrc2srt(file_name):
                     + pre_lyric
                     + "\n"
                 )
-                if enter_flag:
+                if enter_flag:  # 针对LyricCapture的模式三
                     srt.write("\n")
                     enter_flag = False
                 pre_time = time
+                if first_chinese_flag:
+                    pre_time = get_time(line)
+                    first_chinese_flag = False
                 pre_lyric = get_lyric(line)
             n += 1  # 写最后一行
             srt.write(
@@ -215,7 +229,7 @@ if __name__ == "__main__":
 
     os.system("")  # 没有这一句cmd颜色显示不出来
     print(
-        "\033[1;32;40m显示持续时间大于8秒的歌词,请注意是否为间奏,同时注意最后一句歌词(默认持续时间为8秒)。如果使用LyricCapture的模式三,请注意中外歌词交界的地方\033[0m\n\n"
+        "\033[1;32;40m显示持续时间大于8秒的歌词,请注意是否为间奏,同时注意最后一句歌词(默认持续时间为8秒)\033[0m\n\n"
     )
     for file_name in os.listdir():  # 转换当前目录中所有lrc文件
         if file_name.endswith("lrc"):
