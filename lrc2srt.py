@@ -18,7 +18,7 @@ def check_version():
     except:
         try:
             resp = requests.get(
-                "https://gitee.com/djj45/lrc2srt/raw/master/version", headers=headers
+                "https://raw.githubusercontent.com/djj45/lrc2srt/master/version", headers=headers
             )
         except:
             return "error"
