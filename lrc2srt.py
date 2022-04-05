@@ -7,7 +7,7 @@ INTERVAL = 8
 headers = {
     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36"
 }
-version = 20220404
+version = 20220405
 
 
 def check_version():
@@ -86,7 +86,7 @@ def get_lyric(line):
     if line.find("&#") != -1:
         return qq_music(line.split("]")[1])
     else:
-        return line.split("]")[1]
+        return line.split("]")[1].split("[")[0]
 
 
 def extend_time(time):
@@ -129,12 +129,17 @@ def time_trans(time):
         )
 
 
-def check_time(pre_time, time, pre_lyric):
+def check_time(pre_time, time, pre_lyric, enter_flag, once_flag):
     """
     显示持续时间超过INTERVAL(8秒)的歌词
     """
     if time_trans(time) - time_trans(pre_time) > INTERVAL:
         print(pre_time + " --> " + time + " " + pre_lyric.replace("\n", ""))
+    elif abs(time_trans(time) - time_trans(pre_time)) > 50 and once_flag:
+        time = extend_time(pre_time)
+        enter_flag = True
+        once_flag = False
+    return time, enter_flag, once_flag
 
 
 def qq_music(lyric):
@@ -147,6 +152,8 @@ def qq_music(lyric):
 def lrc2srt(file_name):
     n = 0
     flag = True  # 读第一行然后跳过,此后读第n行写第n-1行
+    enter_flag = False
+    once_flag = True
     lrc_encoding = "utf-8"
     lrc_errors = ""
 
@@ -168,7 +175,7 @@ def lrc2srt(file_name):
                     continue
                 n += 1
                 time = get_time(line)
-                check_time(pre_time, time, pre_lyric)
+                time, enter_flag, once_flag = check_time(pre_time, time, pre_lyric, enter_flag, once_flag)
                 srt.write(
                     str(n)
                     + "\n"
@@ -181,6 +188,9 @@ def lrc2srt(file_name):
                     + pre_lyric
                     + "\n"
                 )
+                if enter_flag:
+                    srt.write("\n")
+                    enter_flag = False
                 pre_time = time
                 pre_lyric = get_lyric(line)
             n += 1  # 写最后一行
