@@ -7,7 +7,7 @@ INTERVAL = 8
 headers = {
     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36"
 }
-version = 20220406
+version = 20220407
 
 
 def check_version():
@@ -65,7 +65,7 @@ def is_lyric(line):
     except:
         return False
     else:
-        if line.split("]")[1].find("//") == -1:
+        if line.split("]")[1].find("//") == -1 and line.split("]")[1].find("腾讯享有本翻译作品的著作权") == -1:
             return True
         else:
             return False
