@@ -7,7 +7,7 @@ INTERVAL = 8
 headers = {
     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36"
 }
-version = 20220407
+version = 20220412
 
 
 def check_version():
@@ -57,18 +57,24 @@ def is_lyric(line):
     """
     歌词开头为[00:00.00],[与:中间为数字
     [ver:v1.0]之类的不是歌词
-    https://github.com/ElliottSilence/LyricCapture
-    的模式三自带中外歌词分离功能,没有对应中文翻译的歌词变成"//"
     """
     try:
         int(line.split("[")[1].split(":")[0])
     except:
         return False
     else:
-        if line.split("]")[1].find("//") == -1 and line.split("]")[1].find("腾讯享有本翻译作品的著作权") == -1:
-            return True
-        else:
-            return False
+        return True
+
+
+def add_blank(line):
+    '''
+    为了解决在缺少部分中文翻译和中文在外文下面的前提下调换双语字幕顺序因缺少翻译导致歌词的位置变动的问题
+    把"//"和空白歌词替换为"\" + "n",ass格式表示一个空白字符而不是没有内容
+    '''
+    if line.find("//") == -1:
+        return "".join([line.replace("\n", ""), "\\n\n"])
+    else:
+        return line.replace("//", "\\n")
 
 
 def get_time(line):
@@ -172,6 +178,7 @@ def lrc2srt(file_name):
             for line in lrc:
                 if not is_lyric(line):  # 跳过非歌词
                     continue
+                line = add_blank(line)
                 if flag:
                     pre_time = get_time(line)
                     pre_lyric = get_lyric(line)
