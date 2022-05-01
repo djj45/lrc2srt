@@ -7,7 +7,7 @@ INTERVAL = 8
 headers = {
     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36"
 }
-version = 20220412
+version = 20220502
 
 
 def check_version():
@@ -53,17 +53,21 @@ def check_encoding(file_name):
         return "utf-8"
 
 
-def is_lyric(line):
+def is_lyric(line, mode):
     """
     歌词开头为[00:00.00],[与:中间为数字
     [ver:v1.0]之类的不是歌词
     """
     try:
-        int(line.split("[")[1].split(":")[0])
+        if mode == "1":
+            if line[-2] != "]" and line[-2] != "/":
+                return True
+        else:
+            if line[-2] != "/":
+                int(line.split("[")[1].split(":")[0])
+                return True
     except:
         return False
-    else:
-        return True
 
 
 def add_blank(line):
@@ -158,7 +162,7 @@ def qq_music(lyric):
     return html.unescape(lyric)
 
 
-def lrc2srt(file_name):
+def lrc2srt(file_name, mode):
     n = 0
     flag = True  # 读第一行然后跳过,此后读第n行写第n-1行
     enter_flag = False
@@ -176,7 +180,7 @@ def lrc2srt(file_name):
     with open(file_name.split(".")[0] + ".srt", "w", encoding="utf-8") as srt:
         with open(file_name, "r", encoding=lrc_encoding, errors=lrc_errors) as lrc:
             for line in lrc:
-                if not is_lyric(line):  # 跳过非歌词
+                if not is_lyric(line, mode):  # 跳过非歌词
                     continue
                 line = add_blank(line)
                 if flag:
@@ -232,6 +236,11 @@ def lrc2srt(file_name):
 
 
 if __name__ == "__main__":
+    os.system("")
+    print("\033[1;32;40m单语歌词输入1回车,双语歌词输入2回车\033[0m")
+    mode = "0"
+    while mode != "1" and mode != "2":
+        mode = input()
     count = 0
 
     os.system("")  # 没有这一句cmd颜色显示不出来
@@ -241,7 +250,7 @@ if __name__ == "__main__":
     for file_name in os.listdir():  # 转换当前目录中所有lrc文件
         if file_name.endswith("lrc"):
             count += 1
-            lrc2srt(file_name)
+            lrc2srt(file_name, mode)
             print("\n")
     if not count:
         os.system("")
