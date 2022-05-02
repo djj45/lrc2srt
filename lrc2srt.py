@@ -209,7 +209,7 @@ def lrc2srt(file_name):
 
     print("\033[1;34;40m%s\033[0m" % file_name)
 
-    with open(file_name.split(".")[0] + ".srt", "w", encoding="utf-8") as srt:
+    with open(file_name.replace(".lrc", "") + ".srt", "w", encoding="utf-8") as srt:
         with open(file_name, "r", encoding=lrc_encoding, errors=lrc_errors) as lrc:
             for line in lrc:
                 if not is_lyric(line):  # 跳过非歌词
